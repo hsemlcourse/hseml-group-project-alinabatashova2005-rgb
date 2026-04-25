@@ -14,6 +14,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, f1_score, accuracy_score
 from sklearn.model_selection import cross_val_score, StratifiedKFold, train_test_split
 from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import silhouette_score, davies_bouldin_score
 
 warnings.filterwarnings("ignore")
 
@@ -32,7 +33,7 @@ DATA_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "raw", "breakf
 df_raw = pd.read_csv(DATA_PATH)
 
 print("1. ДАННЫЕ")
-print(f"   Источник  : Kaggle - Global Grocery Inflation 2025-2026")
+print("   Источник  : Kaggle - Global Grocery Inflation 2025-2026")
 print(f"   Строк     : {df_raw.shape[0]:,} | Столбцов: {df_raw.shape[1]}")
 print(f"   Городов   : {df_raw['City'].nunique()} | Месяцев: {df_raw['Month'].nunique()}")
 print(f"   Категории : {sorted(df_raw['Item_Category'].unique())}")
@@ -59,7 +60,7 @@ df["Price_USD"] = df.groupby("Item_Key")["Price_USD"].transform(cap_iqr)
 df["Breakfast_Basket_USD"] = cap_iqr(df["Breakfast_Basket_USD"])
 
 print("\n2. ОЧИСТКА")
-print(f"   Пропуски: отсутствуют | Дубли: 0 | Выбросы: IQR-кэпинг по товару")
+print("   Пропуски: отсутствуют | Дубли: 0 | Выбросы: IQR-кэпинг по товару")
 print(f"   Итог: {df.shape[0]:,} строк x {df.shape[1]} столбцов")
 
 
@@ -195,17 +196,15 @@ Xtr_p  = Xtr_p[:, :n90]
 Xval_p = Xval_p[:, :n90]
 Xte_p  = Xte_p[:, :n90]
 
-print(f"\n5. РАЗБИЕНИЕ (train/val/test)")
+print("\n5. РАЗБИЕНИЕ (train/val/test)")
 print(f"   Train : {len(idx_train)} корзин (60%)")
 print(f"   Val   : {len(idx_val)} корзин (20%) - подбор гиперпараметров")
 print(f"   Test  : {len(idx_test)} корзин (20%) - финальная оценка")
 print(f"   PCA: {n90} компонент (90% дисперсии)")
-print(f"   Data leakage исключён: scaler/PCA/KMeans обучены только на train")
+print("   Data leakage исключён: scaler/PCA/KMeans обучены только на train")
 
 
 # 6. Кластеризация KMeans - только на train, K=6
-
-from sklearn.metrics import silhouette_score, davies_bouldin_score
 
 print("\n6. КЛАСТЕРИЗАЦИЯ (K=6)")
 for k in [4, 5, 6, 7]:
@@ -331,7 +330,7 @@ exp_df.to_csv("outputs/таблица_экспериментов.csv", index=Fal
 best_name = exp_df.loc[exp_df["CV F1"].idxmax(), "Модель"]
 best_pred = lr_pred if "Логистическая" in best_name else rf_pred
 
-print(f"\n9. РЕЗУЛЬТАТЫ")
+print("\n9. РЕЗУЛЬТАТЫ")
 print(exp_df.to_string(index=False))
 print(f"\n   Лучшая модель: {best_name}")
 print("\n   Отчёт по классам:")
