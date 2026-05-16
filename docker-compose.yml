@@ -1,0 +1,9 @@
+version: "3.9"
+
+services:
+  segmentation:
+    build: .
+    volumes:
+      - ./data:/app/data
+      - ./figures:/app/figures
+      - ./outputs:/app/outputs
